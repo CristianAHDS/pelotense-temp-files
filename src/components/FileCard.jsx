@@ -105,7 +105,7 @@ export default function FileCard({ file, onDelete }) {
           </IconButton>
           <IconButton
             size="small"
-            onClick={() => onDelete(file.id)}
+            onClick={() => onDelete(file.id, file.downloadUrl)}
             color="error"
           >
             <Delete fontSize="small" />

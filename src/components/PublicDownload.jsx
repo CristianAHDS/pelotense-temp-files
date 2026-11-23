@@ -45,7 +45,7 @@ export default function PublicDownload() {
     setLoading(true)
     try {
       const link = document.createElement('a')
-      link.href = arquivo.dataUrl
+      link.href = arquivo.downloadUrl
       link.download = arquivo.nome
       document.body.appendChild(link)
       link.click()

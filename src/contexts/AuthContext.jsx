@@ -1,35 +1,45 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react'
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../firebase/config'
 
-const AuthContext = createContext(null);
-
-const ADMIN_EMAIL = 'admin@ahoradosul.com.br';
-const ADMIN_SENHA = '99y!DlS&7j';
+const AuthContext = createContext(null)
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(sessionStorage.getItem('ptf_token'));
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u)
+      setLoading(false)
+    })
+    return () => unsub()
+  }, [])
 
   const login = async (email, senha) => {
-    if (email === ADMIN_EMAIL && senha === ADMIN_SENHA) {
-      const token = btoa(`${email}:${Date.now()}`);
-      setToken(token);
-      sessionStorage.setItem('ptf_token', token);
-      return true;
+    try {
+      await signInWithEmailAndPassword(auth, email, senha)
+      return true
+    } catch (error) {
+      console.error('Erro ao fazer login:', error)
+      return false
     }
-    return false;
-  };
+  }
 
-  const logout = () => {
-    setToken(null);
-    sessionStorage.removeItem('ptf_token');
-  };
+  const logout = async () => {
+    try {
+      await signOut(auth)
+      setUser(null)
+    } catch (error) {
+      console.error('Erro ao sair:', error)
+    }
+  }
 
   return (
-    <AuthContext.Provider
-      value={{ token, login, logout, isAuthenticated: !!token }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext)

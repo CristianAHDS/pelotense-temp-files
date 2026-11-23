@@ -31,9 +31,9 @@ export default function AdminPanel({ logout }) {
     setLoading(false)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, downloadUrl) => {
     if (!confirm('Deseja excluir este arquivo?')) return
-    removeFile(id)
+    removeFile(id, downloadUrl)
   }
 
   return (
